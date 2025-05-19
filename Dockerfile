@@ -22,11 +22,6 @@ RUN flutter upgrade
 WORKDIR /app
 COPY --chown=developer:developer . .
 
-# Create a temporary .env file with Railway variables
-RUN echo "API_BASE_URL=http://${RAILWAY_PRIVATE_DOMAIN}" > .env
-
-# Print the RAILWAY_PRIVATE_DOMAIN variable
-RUN echo ${RAILWAY_PRIVATE_DOMAIN}
 
 RUN flutter build web
 
