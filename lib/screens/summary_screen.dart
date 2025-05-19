@@ -3,8 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/dividend_bloc.dart';
 import '../models/dividend_record.dart';
 
-class SummaryScreen extends StatelessWidget {
+class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
+
+  @override
+  State<SummaryScreen> createState() => _SummaryScreenState();
+}
+
+class _SummaryScreenState extends State<SummaryScreen> {
+  late int selectedYear;
+  late List<int> years;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    years = List.generate(5, (i) => now.year - i);
+    selectedYear = years.first;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DividendBloc>().add(LoadDividendsSummary(year: selectedYear.toString()));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,34 +34,61 @@ class SummaryScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<DividendBloc>().add(const LoadDividendsSummary());
+              context.read<DividendBloc>().add(LoadDividendsSummary(year: selectedYear.toString()));
             },
           ),
         ],
       ),
-      body: BlocBuilder<DividendBloc, DividendState>(
-        builder: (context, state) {
-          if (state is DividendLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          
-          if (state is DividendError) {
-            return Center(
-              child: Text(
-                'Error: ${state.message}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-
-          if (state is DividendLoaded) {
-            return _buildSummaryContent(context, state.dividends);
-          }
-
-          return const Center(
-            child: Text('No dividend data available'),
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                const Text('Year: '),
+                const SizedBox(width: 8),
+                DropdownButton<int>(
+                  value: selectedYear,
+                  items: years.map((year) => DropdownMenuItem(
+                    value: year,
+                    child: Text(year.toString()),
+                  )).toList(),
+                  onChanged: (year) {
+                    if (year != null) {
+                      setState(() {
+                        selectedYear = year;
+                      });
+                      context.read<DividendBloc>().add(LoadDividendsSummary(year: year.toString()));
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<DividendBloc, DividendState>(
+              builder: (context, state) {
+                if (state is DividendLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is DividendError) {
+                  return Center(
+                    child: Text(
+                      'Error: [31m[1m${state.message}[0m',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+                if (state is DividendLoaded) {
+                  return _buildSummaryContent(context, state.dividends);
+                }
+                return const Center(
+                  child: Text('No dividend data available'),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
