@@ -1,0 +1,4 @@
+hooks:
+  pre-commit:
+    - echo "Building Flutter web..."
+    - flutter build web 
