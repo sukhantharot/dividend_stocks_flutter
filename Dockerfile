@@ -22,7 +22,7 @@ WORKDIR /app
 COPY . .
 
 # Create a temporary .env file with Railway variables
-RUN echo "API_BASE_URL=https://${dividend-stocks.RAILWAY_PRIVATE_DOMAIN}" > .env
+RUN echo "API_BASE_URL=http://${RAILWAY_PRIVATE_DOMAIN}" > .env
 
 RUN flutter build web
 
