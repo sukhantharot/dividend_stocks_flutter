@@ -37,6 +37,6 @@ COPY --from=build-env /app/build/web /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 8889
 
 CMD ["nginx", "-g", "daemon off;"] 
