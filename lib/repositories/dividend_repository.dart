@@ -8,7 +8,7 @@ class DividendRepository {
 
   Future<List<DividendRecord>> getDividends(String symbol) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/dividends?symbol=$symbol'),
+      Uri.parse('$baseUrl/dividends-panphor?symbol=$symbol'),
     );
 
     if (response.statusCode == 200) {
