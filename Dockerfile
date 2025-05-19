@@ -28,9 +28,9 @@ RUN echo "API_BASE_URL=https://dividend-stocks-production.up.railway.app" > .env
 RUN flutter build web
 
 # Stage 2 - Create the run-time image
-FROM nginx:1.25.2-alpine
-COPY --from=build-env /app/build/web /usr/share/nginx/html
+FROM busybox:latest
+COPY --from=build-env /app/build/web /www
 
 EXPOSE 8889
 
-CMD ["nginx", "-g", "daemon off;"] 
+CMD ["busybox", "httpd", "-f", "-v", "-p", "8889", "-h", "/www"] 
