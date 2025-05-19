@@ -18,10 +18,11 @@ RUN flutter doctor -v
 RUN flutter channel stable
 RUN flutter upgrade
 
-# Copy files to container and build
-WORKDIR /app
-COPY --chown=developer:developer . .
+# Create a temporary .env file with Railway variables
+RUN echo "API_BASE_URL=https://dividend-stocks-production.up.railway.app" > .env
 
+# Print the RAILWAY_PRIVATE_DOMAIN variable
+RUN echo ${RAILWAY_PRIVATE_DOMAIN}
 
 RUN flutter build web
 
