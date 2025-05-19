@@ -1,36 +1,37 @@
-# Use the official Flutter image
-FROM debian:latest AS build-env
+# Stage 1 - Build the flutter web app
+FROM dart:stable AS build
 
-# Install necessary build dependencies
-RUN apt-get update 
-RUN apt-get install -y curl git wget unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback lib32stdc++6 python3
-RUN apt-get clean
+# Install Flutter SDK
+RUN git clone https://github.com/flutter/flutter.git /flutter
+ENV PATH="/flutter/bin:/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
-# Clone the Flutter repo
-RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
+# Enable web support
+RUN flutter config --enable-web
 
-# Set Flutter path
-ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
-
-# Run Flutter doctor
-RUN flutter doctor -v
-RUN flutter channel stable
-RUN flutter upgrade
-
-# Copy files to container and build
+# Get Flutter dependencies
 WORKDIR /app
 COPY . .
 
-# Create a temporary .env file with Railway variables
+# ✅ เพิ่ม .env file ที่นี่
 RUN echo "API_BASE_URL=https://dividend-stocks-production.up.railway.app" > .env
 
-# Build Flutter web
-RUN flutter build web
+RUN flutter pub get
+RUN flutter build web --release
 
-# Stage 2 - Create the run-time image
-FROM busybox:latest
-COPY --from=build-env /app/build/web /www
+# Stage 2 - Serve app with nginx
+FROM nginx:stable-alpine
 
+# Remove default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy Flutter build to nginx html directory
+COPY --from=build /app/build/web /usr/share/nginx/html
+
+# Copy custom nginx config (optional)
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port
 EXPOSE 8889
 
-CMD ["busybox", "httpd", "-f", "-v", "-p", "8889", "-h", "/www"] 
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
