@@ -6,19 +6,12 @@ RUN apt-get update
 RUN apt-get install -y curl git wget unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback lib32stdc++6 python3
 RUN apt-get clean
 
-# Create a non-root user
-RUN useradd -ms /bin/bash developer
-RUN chown -R developer:developer /usr/local
 
 # Clone the Flutter repo
 RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
 
 # Set Flutter path
 ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
-
-# Switch to non-root user
-USER developer
-WORKDIR /home/developer
 
 # Run Flutter doctor
 RUN flutter doctor -v
@@ -32,17 +25,19 @@ COPY --chown=developer:developer . .
 # Create a temporary .env file with Railway variables
 RUN echo "API_BASE_URL=http://${RAILWAY_PRIVATE_DOMAIN}" > .env
 
+# Print the RAILWAY_PRIVATE_DOMAIN variable
+RUN echo ${RAILWAY_PRIVATE_DOMAIN}
+
 RUN flutter build web
 
 # Stage 2 - Create the run-time image
-FROM nginx:1.21.1-alpine
+FROM nginx:1.25.2-alpine
 COPY --from=build-env /app/build/web /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Use PORT environment variable with fallback to 8888
-ENV PORT=8888
-EXPOSE ${PORT}
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"] 
