@@ -4,41 +4,19 @@ import '../blocs/dividend_bloc.dart';
 import '../widgets/dividend_list.dart';
 import '../widgets/search_bar.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class PanphorScreen extends StatelessWidget {
+  const PanphorScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thai Stock Dividend'),
+        title: const Text('Panphor Dividend'),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'panphor':
-                  Navigator.pushNamed(context, '/panphor');
-                  break;
-                case 'summary':
-                  context.read<DividendBloc>().add(const LoadDividendsSummary());
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem<String>(
-                value: 'panphor',
-                child: Text('Panphor'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'summary',
-                child: Text('Summary'),
-              ),
-            ],
-          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<DividendBloc>().add(const LoadDividendsSummary());
+              // TODO: Implement refresh for Panphor
             },
           ),
         ],
@@ -49,7 +27,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: DividendSearchBar(
               onSearch: (symbol) {
-                context.read<DividendBloc>().add(LoadDividends(symbol));
+                context.read<DividendBloc>().add(LoadDividendsPanphor(symbol));
               },
             ),
           ),

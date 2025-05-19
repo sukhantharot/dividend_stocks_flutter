@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
+import 'screens/panphor_screen.dart';
 import 'blocs/dividend_bloc.dart';
 import 'repositories/dividend_repository.dart';
 
@@ -37,7 +38,11 @@ class MyApp extends StatelessWidget {
             ),
             useMaterial3: true,
           ),
-          home: const HomeScreen(),
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const HomeScreen(),
+            '/panphor': (context) => const PanphorScreen(),
+          },
         ),
       ),
     );
