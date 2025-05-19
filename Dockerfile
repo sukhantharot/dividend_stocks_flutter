@@ -24,9 +24,6 @@ COPY . .
 # Create a temporary .env file with Railway variables
 RUN echo "API_BASE_URL=https://dividend-stocks-production.up.railway.app" > .env
 
-# Print the RAILWAY_PRIVATE_DOMAIN variable
-RUN echo ${RAILWAY_PRIVATE_DOMAIN}
-
 # Build Flutter web
 RUN flutter build web
 
