@@ -33,6 +33,8 @@ COPY --from=build-env /app/build/web /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 8080
+# Use PORT environment variable with fallback to 8080
+ENV PORT=8888
+EXPOSE ${PORT}
 
 CMD ["nginx", "-g", "daemon off;"] 
