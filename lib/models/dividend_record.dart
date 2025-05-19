@@ -31,7 +31,7 @@ class DividendRecord {
       xdDate: json['xd_date'] as String,
       payDate: json['pay_date'] as String,
       type: json['type'] as String,
-      scrapedAt: json['scraped_at'] as int,
+      scrapedAt: (json['scraped_at'] as num).toInt(),
     );
   }
 
