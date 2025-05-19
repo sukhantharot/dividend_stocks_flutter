@@ -21,9 +21,6 @@ RUN flutter upgrade
 WORKDIR /app
 COPY . .
 
-# Create a temporary .env file with Railway variables
-RUN echo "API_BASE_URL=https://${RAILWAY_PUBLIC_DOMAIN}" > .env
-
 RUN flutter build web
 
 # Stage 2 - Create the run-time image
