@@ -4,8 +4,22 @@ import '../blocs/dividend_bloc.dart';
 import '../widgets/dividend_list.dart';
 import '../widgets/search_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load upcoming dividends when the screen is first loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DividendBloc>().add(const LoadUpcomingDividends());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +36,9 @@ class HomeScreen extends StatelessWidget {
                 case 'summary':
                   context.read<DividendBloc>().add(const LoadDividendsSummary());
                   break;
+                case 'upcoming':
+                  context.read<DividendBloc>().add(const LoadUpcomingDividends());
+                  break;
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -33,32 +50,36 @@ class HomeScreen extends StatelessWidget {
                 value: 'summary',
                 child: Text('Summary'),
               ),
+              const PopupMenuItem<String>(
+                value: 'upcoming',
+                child: Text('Upcoming Dividends'),
+              ),
             ],
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<DividendBloc>().add(const LoadDividendsSummary());
+              context.read<DividendBloc>().add(const LoadUpcomingDividends());
             },
           ),
         ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: DividendSearchBar(
-              onSearch: (symbol) {
-                context.read<DividendBloc>().add(LoadDividends(symbol));
-              },
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(16.0),
+          //   child: DividendSearchBar(
+          //     onSearch: (symbol) {
+          //       context.read<DividendBloc>().add(LoadDividends(symbol));
+          //     },
+          //   ),
+          // ),
           Expanded(
             child: BlocBuilder<DividendBloc, DividendState>(
               builder: (context, state) {
                 if (state is DividendInitial) {
                   return const Center(
-                    child: Text('Enter a stock symbol to search'),
+                    child: Text('Loading upcoming dividends...'),
                   );
                 }
                 if (state is DividendLoading) {

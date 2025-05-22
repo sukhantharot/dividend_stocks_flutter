@@ -16,7 +16,8 @@ COPY . .
 RUN echo "API_BASE_URL=https://dividend-stocks-production.up.railway.app" > .env
 
 RUN flutter pub get
-RUN flutter build web --release
+RUN flutter build web --release \
+    --dart-define=API_BASE_URL=https://dividend-stocks-production.up.railway.app
 
 # Stage 2 - Serve app with nginx
 FROM nginx:stable-alpine

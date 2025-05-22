@@ -39,6 +39,13 @@ class LoadDividendsSummary extends DividendEvent {
   List<Object> get props => [year ?? ''];
 }
 
+class LoadUpcomingDividends extends DividendEvent {
+  const LoadUpcomingDividends();
+
+  @override
+  List<Object> get props => [];
+}
+
 // States
 abstract class DividendState extends Equatable {
   const DividendState();
@@ -77,6 +84,7 @@ class DividendBloc extends Bloc<DividendEvent, DividendState> {
     on<LoadDividends>(_onLoadDividends);
     on<LoadDividendsPanphor>(_onLoadDividendsPanphor);
     on<LoadDividendsSummary>(_onLoadDividendsSummary);
+    on<LoadUpcomingDividends>(_onLoadUpcomingDividends);
   }
 
   Future<void> _onLoadDividends(
@@ -121,6 +129,19 @@ class DividendBloc extends Bloc<DividendEvent, DividendState> {
       final List<DividendRecord> dividends = (summary['summary'] as List)
           .map((item) => DividendRecord.fromJson(item['latest_dividend']))
           .toList();
+      emit(DividendLoaded(dividends));
+    } catch (e) {
+      emit(DividendError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadUpcomingDividends(
+    LoadUpcomingDividends event,
+    Emitter<DividendState> emit,
+  ) async {
+    emit(DividendLoading());
+    try {
+      final dividends = await dividendRepository.getUpcomingDividends();
       emit(DividendLoaded(dividends));
     } catch (e) {
       emit(DividendError(e.toString()));
