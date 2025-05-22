@@ -4,8 +4,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
 import 'screens/panphor_screen.dart';
 import 'screens/summary_screen.dart';
+import 'screens/health_screen.dart';
 import 'blocs/dividend_bloc.dart';
+import 'blocs/health_bloc.dart';
 import 'repositories/dividend_repository.dart';
+import 'repositories/health_repository.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -17,12 +20,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => DividendRepository(),
-      child: BlocProvider(
-        create: (context) => DividendBloc(
-          dividendRepository: context.read<DividendRepository>(),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => DividendRepository(),
         ),
+        RepositoryProvider(
+          create: (context) => HealthRepository(),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => DividendBloc(
+              dividendRepository: context.read<DividendRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => HealthBloc(
+              healthRepository: context.read<HealthRepository>(),
+            ),
+          ),
+        ],
         child: MaterialApp(
           title: 'Thai Stock Dividend',
           theme: ThemeData(
@@ -39,11 +58,12 @@ class MyApp extends StatelessWidget {
             ),
             useMaterial3: true,
           ),
-          initialRoute: '/',
+          initialRoute: '/health',
           routes: {
             '/': (context) => const HomeScreen(),
             '/panphor': (context) => const PanphorScreen(),
             '/summary': (context) => const SummaryScreen(),
+            '/health': (context) => const HealthScreen(),
           },
         ),
       ),
